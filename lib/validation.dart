@@ -45,7 +45,25 @@ class Validation{
     if(value!.isEmpty){
       return "price is required";
     }
+
     return null;
+
+  }
+
+  String? validateStock (String? value)
+  {
+    if(value!.isEmpty){
+      return "stock is required";
+    }
+
+   else if(int.parse(value) < 0 || int.parse(value) > 10) {
+
+     return "must between 0 and 10";
+    }
+
+
+
+      return null;
 
   }
 

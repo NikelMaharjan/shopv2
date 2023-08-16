@@ -2,6 +2,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:simple_shop/constants/colors.dart';
+import 'package:simple_shop/providers/common_provider.dart';
 import 'package:simple_shop/validation.dart';
 
 import '../../common/show_snack.dart';
@@ -31,20 +33,22 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
 
 
   @override
-  Widget build(BuildContext context, ) {
+  Widget build(BuildContext context ) {
 
     final deviceheight = MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
     final devicewidth = MediaQuery.of(context).size.width;
 
     final isVisible = ref.watch(validateProvider);
     final auth = ref.watch(authProvider);
+    final mode = ref.watch(modeProvider);
 
 
     ref.listen(authProvider, (previous, next) {    //this is like stream. continuous watching. next is new state value
       if(next.isError){
-        CommonSnack.errrorSnack(context, next.errText);
+        CommonSnack.errrorSnack(context: context, msg: next.errText);
       }else if(next.isSuccess){
-        CommonSnack.successSnack(context, 'successfully login');
+        CommonSnack.successSnack(context: context,  msg: 'successfully login');
+        Get.back();
       }
 
     });
@@ -52,13 +56,12 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
     return SafeArea(
       child: Scaffold(
           resizeToAvoidBottomInset: false,
-          //  backgroundColor: Colors.white,
           body: Stack(
             children: [
               Container(
                 width: double.infinity,
                 height: deviceheight * 0.33,
-                color: const Color(0xff4252B5),
+                color: AppColor.blue,
                 child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
@@ -90,6 +93,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                                 height:  deviceheight * 0.49,
                                 child: Form(
                                   key: _form,
+                                  autovalidateMode: mode,
                                   child: Column(
                                     children: [
                                       Padding(
@@ -149,24 +153,21 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                                         backgroundColor: const Color(0xff4252B5),
                                         minimumSize: const Size(double.infinity, 0),
                                       ),
-                                      onPressed:  auth.isLoad ? null : ()  async {
+                                      onPressed:  auth.isLoad ? null : ()  {
+                                        FocusScope.of(context).unfocus();
                                         _form.currentState!.save();
                                         if(_form.currentState!.validate()){
-
-                                          // await  ref.read(authProvider.notifier).userSignUp(
-                                          //   email: mailController.text.trim(),
-                                          //   password: passController.text.trim(),
-                                          //   username: nameController.text.trim(),
-                                          // );
-
-
-
-
-
+                                            ref.read(authProvider.notifier).userSignUp(
+                                            email: mailController.text.trim(),
+                                            password: passController.text.trim(),
+                                            fullname: nameController.text.trim(),
+                                          );
                                         }
 
+                                        else {
+                                          ref.read(modeProvider.notifier).changeMode();
 
-
+                                        }
 
                                       },
 
@@ -189,9 +190,7 @@ class _SignUpPageState extends ConsumerState<SignUpPage> {
                         TextButton(
                             onPressed: () {
 
-
                               Get.back();
-
 
                             },
                             child:  Text(

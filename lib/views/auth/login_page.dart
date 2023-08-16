@@ -2,6 +2,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:simple_shop/constants/colors.dart';
+import 'package:simple_shop/constants/font.dart';
+import 'package:simple_shop/providers/common_provider.dart';
 import 'package:simple_shop/validation.dart';
 import 'package:simple_shop/views/auth/signup_page.dart';
 
@@ -35,13 +38,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     final isVisible = ref.watch(validateProvider);
     final auth = ref.watch(authProvider);
+    final mode = ref.watch(modeProvider);
 
 
     ref.listen(authProvider, (previous, next) {    //this is like stream. continuous watching. next is new state value
       if(next.isError){
-        CommonSnack.errrorSnack(context, next.errText);
+        CommonSnack.errrorSnack(context: context, msg: next.errText);
       }else if(next.isSuccess){
-        CommonSnack.successSnack(context, 'successfully login');
+        CommonSnack.successSnack(context: context, msg: 'successfully login');
       }
 
 
@@ -62,7 +66,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   Container(
                     width: double.infinity,
                     height: deviceheight * 0.33,
-                    color: const Color(0xff4252B5),
+                    color: AppColor.blue,
                     child: Align(
                         alignment: Alignment.topCenter,
                         child: Padding(
@@ -83,13 +87,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
                         TextButton(
                             onPressed: () {
-
                               Get.to(SignUpPage(), transition: Transition.leftToRight);
-
                             },
                             child:  Text(
                               "Sign Up" ,
-                              style: TextStyle(fontSize: 18),
+                              style: AppFont.textButton,
                             ))
                       ],
                     ),
@@ -120,13 +122,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 height:  deviceheight * 0.42,
                                 child: Form(
                                   key: _form,
+                                  autovalidateMode: mode,
                                   child: Column(
+
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.only(top: 60.0),
                                         child: Text('Login',
-                                          style: TextStyle(
-                                              fontSize: 22, color: Color(0xff4252B5)),
+                                          style: AppFont.loginSignupText,
                                         ),
                                       ),
                                       const SizedBox(
@@ -148,7 +151,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                           },
                                           controller:  passController,
                                           hintText: "Password",
-                                         validator: widget.validatePassword,
+                                          validator: widget.validatePassword,
                                           obscureText: isVisible,
                                           prefixIcon: CupertinoIcons.padlock,
                                           suffixIcon: isVisible ? Icons.visibility_off : Icons.visibility
@@ -172,14 +175,17 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         backgroundColor: const Color(0xff4252B5),
                                         minimumSize: const Size(double.infinity, 0),
                                       ),
-                                      onPressed:  auth.isLoad ? null : ()  async {
+                                      onPressed:  auth.isLoad ? null : ()  {
                                         _form.currentState!.save();
                                         if(_form.currentState!.validate()){
-                                          await ref.read(authProvider.notifier).userLogin(
+                                           ref.read(authProvider.notifier).userLogin(
                                               email: mailController.text.trim(),
                                               password: passController.text.trim(),
                                           );
                                           }
+                                        else{
+                                          ref.read(modeProvider.notifier).changeMode();
+                                        }
                                         },
 
                                       child: auth.isLoad ? CircularProgressIndicator() : const Text("Submit")))
@@ -215,7 +221,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   icon: Icon(suffixIcon),
                   onPressed: onTap,
                   color: Colors.black,
-
                 )
             ),
           ),

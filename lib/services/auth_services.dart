@@ -18,10 +18,7 @@ class AuthService{
 
   static final dio = Dio();
 
-  static Future<Either<String, User>> userLogin({
-    required String email,
-    required String password
-  }) async {
+  static Future<Either<String, User>> userLogin({required String email, required String password}) async {
     try {
       final response = await dio.post(Api.userLogin,
           data: {
@@ -38,7 +35,28 @@ class AuthService{
       user.put('userInfo', jsonEncode(response.data));  //putting response data in user box in 'userInfo' keyname. box wont take map. so need to convert map into string (jsonEncode)
       return Right(User.fromJson(response.data));
     } on DioException catch (err) {
-      print(err.response);
+      print(err.error);
+      return Left(DioExceptions.getDioError(err));
+    }
+  }
+
+  static Future<Either<String, bool>> userSignUp({required String email, required String password, required String fullname}) async {
+    try {
+      final response = await dio.post(Api.userSignUp,
+          data: {
+            'email': email,
+            'password': password,
+            'fullname': fullname
+          },
+          options: Options(
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              }
+          ));
+      return Right(true);
+    } on DioException catch (err) {
+      print(err);
       return Left(DioExceptions.getDioError(err));
     }
   }
