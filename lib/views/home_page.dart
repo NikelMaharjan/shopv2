@@ -31,6 +31,7 @@ class HomePage extends StatelessWidget {
           final authData = ref.watch(authProvider);
           return Scaffold(
               appBar: AppBar(
+                title: Text("Products"),
                 elevation: 0,
                 actions: [
                   if(!authData.user!.isAdmin) IconButton(onPressed: (){

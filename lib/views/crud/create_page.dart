@@ -332,6 +332,8 @@ class _CreatePageState extends ConsumerState<CreatePage> {
             //     color: AppColor.blue
             // ),
 
+            labelText: labelText,
+
 
             contentPadding: isPrice == null ? null : EdgeInsets.symmetric(horizontal: 10) ,
 

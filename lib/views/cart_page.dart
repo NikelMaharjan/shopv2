@@ -7,6 +7,8 @@ import 'package:simple_shop/providers/auth_provider.dart';
 import 'package:simple_shop/providers/cart_provider.dart';
 import 'package:simple_shop/providers/common_provider.dart';
 import 'package:get/get.dart';
+import 'package:simple_shop/views/order/address_page.dart';
+import 'package:simple_shop/views/order/order_page.dart';
 
 
 class CartPage extends ConsumerWidget {
@@ -15,7 +17,7 @@ class CartPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, ref) {
     final cartData = ref.watch(cartProvider);
-    final totalData = ref.watch(cartProvider.notifier).totalAmount;
+    final totalAmount = ref.watch(cartProvider.notifier).totalAmount;
     final auth = ref.watch(authProvider);
     final isLoad = ref.watch(loadingProvider);
     return Scaffold(
@@ -98,12 +100,20 @@ class CartPage extends ConsumerWidget {
                   margin: EdgeInsets.only(bottom: 10),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [Text('Total'), Text('Rs. ${totalData}')],
+                    children: [Text('Total'), Text('Rs. ${totalAmount}')],
                   ),
                 ),
                 ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: AppColor.blue),
                     onPressed: (){
+                      if(!auth.user!.isAdmin){
+                        Get.to(AddressPage(), transition: Transition.leftToRight);
+                      }
+
+                      else{
+
+                        Get.to(()=> OrderPage(carts: cartData, total: totalAmount), transition:  Transition.leftToRight);
+                      }
 
                     },
                     child: isLoad ? Text("Please wait") : Text('Check Out'))

@@ -101,7 +101,8 @@ class ProductService {
                 }
             ));
         return Right(true);
-      }else{
+      }
+      else{
         final formData = FormData.fromMap({
           'product_name': product_name,
           'product_detail': product_detail,
